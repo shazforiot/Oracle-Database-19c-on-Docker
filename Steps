@@ -1,0 +1,56 @@
+Pre-requisite:
+
+Docker Installed
+Git Installed
+WinSCP installed on Windows Machine
+Oracle account
+
+--------------------------------
+
+Steps:
+
+git clone https://github.com/oracle/docker-images.git
+Download LINUX.X64_193000_db_home.zip from http://www.oracle.com/technetwork/database/enterprise-edition/downloads/index.html (Need Oracle registered account)
+Copy the file LINUX.X64_193000_db_home.zip from Windows Machine to Linux Docker machine using WinSCP.
+Go to folder docker-images/OracleDatabase/SingleInstance/dockerfiles/ & run the command ./buildContainerImage.sh -v 19.3.0 -e -t oracledb:1.0 to build the oracle DB docker image
+
+Build image Syntax:
+
+Usage: buildContainerImage.sh -v [version] -t [image_name:tag] [-e | -s | -x] [-i] [-o] [container build option]
+Builds a container image for Oracle Database.
+
+Parameters:
+   -v: version to build
+       Choose one of: 11.2.0.2  12.1.0.2  12.2.0.1  18.3.0  18.4.0  19.3.0  21.3.0
+   -t: image_name:tag for the generated docker image
+   -e: creates image based on 'Enterprise Edition'
+   -s: creates image based on 'Standard Edition 2'
+   -x: creates image based on 'Express Edition'
+   -i: ignores the MD5 checksums
+   -o: passes on container build option
+
+* select one edition only: -e, -s, or -x
+
+
+Create docker container using newly build image oracledb:1.0
+docker run \
+-it --name oracledb \
+-p 1521:1521 -p 5500:5500 \
+-e ORACLE_PDB=TESTDB \
+-e ORACLE_PWD=Password1! \
+-v oracledata:/opt/oracle/oradata \
+oracledb:1.0
+
+Give firewall exception using the below commands
+sudo firewall-cmd --add-port=1521/tcp --permanent
+sudo firewall-cmd --add-port=5500/tcp --permanent
+sudo firewall-cmd --reload
+
+Access oracle enterprise manager using https://192.168.0.105:5500/em/
+Login details are as below
+
+user: sys
+password: Password1! ( give the password set in the docker run command)
+Container Name : TESTDB
+
+You can also connect to the database using SQL developer . The SID to be used is ORCLCDB. 
